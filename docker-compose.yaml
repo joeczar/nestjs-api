@@ -1,17 +1,14 @@
 version: '3.9'
 
 services:
-  postgres:
+  nestjs_postgres:
     container_name: bib_postgres
     image: postgres:14-alpine
     ports:
       - 5432:5432
     volumes:
+    - ./db/initdb.d:/docker-entrypoint-initdb.d
     - ./data/postgres:/data/postgres
     env_file:
     - docker.env
-    networks:
-    - postgres
-networks:
-  postgres:
-    driver: bridge
+ 
