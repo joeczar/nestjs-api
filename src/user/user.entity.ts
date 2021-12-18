@@ -9,6 +9,16 @@ export class UserEntity {
     type: 'varchar',
     nullable: true,
   })
+  firstname: string;
+  @Column({
+    type: 'varchar',
+    nullable: true,
+  })
+  lastname: string;
+  @Column({
+    type: 'varchar',
+    nullable: false,
+  })
   password: string;
   @Column({
     type: 'varchar',
