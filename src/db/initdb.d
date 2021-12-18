@@ -1,25 +1,15 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-export $(grep -v '^#' ../.env | xargs)
-$POSTGRES_USER
-# set -e
+set -e
 
-# SERVER="my_database_server";
-# PW="mysecretpassword";
-# DB="my_database";
+psql -v
+ON_ERROR_STOP=1
+--username "$POSTGRES_USER"
+--dbname "$POSTGRES_DB" <<-EOSQL
+CREATE USER bib;
+CREATE DATABASE bib ENCODING UTF8;
+GRANT ALL PRIVILEGES ON DATABASE bib TO bib;
 
-# echo "echo stop & remove old docker [$SERVER] and starting new fresh instance of [$SERVER]"
-# (docker kill $SERVER || :) && \
-#   (docker rm $SERVER || :) && \
-#   docker run --name $SERVER -e POSTGRES_PASSWORD=$PW \
-#   -e PGPASSWORD=$PW \
-#   -p 5432:5432 \
-#   -d postgres
-
-# # wait for pg to start
-# echo "sleep wait for pg-server [$SERVER] to start";
-# SLEEP 3;
-
-# # create the db 
-# echo "CREATE DATABASE $DB ENCODING 'UTF-8';" | docker exec -i $SERVER psql -U postgres
-# echo "\l" | docker exec -i $SERVER psql -U postgres
+ALTER USER bib WITH PASSWORD 'password123';
+ALTER USER bib WITH SUPERUSER;
+EOSQL

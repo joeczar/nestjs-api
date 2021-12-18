@@ -3,7 +3,13 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import { DatabaseModule } from './database/database.module';
+import { AuthService } from './auth/auth.service';
+import { AuthModule } from './auth/auth.module';
 import * as Joi from '@hapi/joi';
+import { UserService } from './user/user.service';
+import { UserModule } from './user/user.module';
+import { JwtModule } from '@nestjs/jwt';
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -14,12 +20,16 @@ import * as Joi from '@hapi/joi';
         POSTGRES_PASSWORD: Joi.string().required(),
         POSTGRES_DATABASE: Joi.string().required(),
         PORT: Joi.number(),
+        JWT_SECRET: Joi.string().required(),
+        JWT_EXPIRATION_TIME: Joi.string().required(),
       }),
     }),
     DatabaseModule,
+    AuthModule,
+    UserModule,
   ],
 
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, AuthService, UserService],
 })
 export class AppModule {}

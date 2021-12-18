@@ -1,14 +1,14 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/createUser.dto';
-import { UserEntity } from './user.entity';
+import { User } from './user.entity';
 
 @Injectable()
 export class UserService {
   constructor(
-    @InjectRepository(UserEntity)
-    private userRepository: Repository<UserEntity>,
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
   ) {}
   async getByEmail(email: string) {
     const user = await this.userRepository.findOne({ email });
@@ -21,8 +21,23 @@ export class UserService {
     );
   }
   async create(userData: CreateUserDto) {
-    const newUser = await this.userRepository.create(userData);
-    await this.userRepository.save(newUser);
-    return newUser;
+    try {
+      Logger.log('UserService - create', { userData });
+      const newUser = await this.userRepository.create(userData);
+      const savedUser = await this.userRepository.save(newUser);
+      Logger.log('UserService - create', { newUser, savedUser });
+      return newUser;
+    } catch (error) {
+      throw new Error('User creation error');
+      Logger.error('User creation error', error);
+    }
+  }
+  async getById(id: string) {
+    const user = await this.userRepository.findOne({ id });
+    if (user) return user;
+    throw new HttpException(
+      "User with this id doesn't exist",
+      HttpStatus.NOT_FOUND,
+    );
   }
 }

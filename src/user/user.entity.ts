@@ -2,7 +2,7 @@ import { BeforeInsert, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import bcrypt from 'bcrypt';
 
 @Entity('user')
-export class UserEntity {
+export class User {
   @PrimaryGeneratedColumn('uuid') id: string;
 
   @Column({
