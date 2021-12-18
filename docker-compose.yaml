@@ -7,8 +7,27 @@ services:
     ports:
       - 5432:5432
     volumes:
-    - ./db/initdb.d:/docker-entrypoint-initdb.d
     - ./data/postgres:/data/postgres
     env_file:
     - docker.env
- 
+    networks:
+    - breakfastinbed
+
+  pgadmin:
+      links:
+      - postgres:postgres
+      container_name: pgadmin
+      image: dpage/pgadmin4
+      ports:
+      - "8088:80"
+      volumes:
+      - ./data/pgadmin:/root/.pgadmin
+      env_file:
+      - docker.env
+      networks:
+      - breakfastinbed
+      depends_on:
+        - nestjs_postgres
+networks:
+  breakfastinbed:
+   driver: bridge

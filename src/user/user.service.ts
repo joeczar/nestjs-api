@@ -10,6 +10,10 @@ export class UserService {
     @InjectRepository(User)
     private userRepository: Repository<User>,
   ) {}
+  async getAll() {
+    const users = this.userRepository.find();
+    return users;
+  }
   async getByEmail(email: string) {
     const user = await this.userRepository.findOne({ email });
     if (user) {
@@ -24,6 +28,7 @@ export class UserService {
     try {
       Logger.log('UserService - create', { userData });
       const newUser = await this.userRepository.create(userData);
+      Logger.log('UserService - create', { newUser });
       const savedUser = await this.userRepository.save(newUser);
       Logger.log('UserService - create', { newUser, savedUser });
       return newUser;

@@ -8,7 +8,6 @@ import { AuthModule } from './auth/auth.module';
 import * as Joi from '@hapi/joi';
 import { UserService } from './user/user.service';
 import { UserModule } from './user/user.module';
-import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [

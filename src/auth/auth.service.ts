@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { PostgresErrorCode } from 'src/database/postgresErrorCodes.enum';
 import { UserService } from 'src/user/user.service';
 import { RegisterDto } from './dto/register.dto';
-import bcrypt from 'bcrypt';
+import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { TokenPayload } from './tokenPayload.interface';
@@ -21,8 +21,7 @@ export class AuthService {
       const createdUser = await this.userService.create({
         ...registrationData,
       });
-      Logger.log('AuthService - register', { createdUser, registrationData });
-      //  createdUser.password = undefined
+      createdUser.password = undefined;
       return createdUser;
     } catch (error) {
       if (error?.code === PostgresErrorCode.UniqueViolation) {
@@ -40,6 +39,7 @@ export class AuthService {
   public async getAuthenticatedUser(email: string, plainTextPassword: string) {
     try {
       const user = await this.userService.getByEmail(email);
+      Logger.log('getAuthenticatedUser', { user, email });
       await this.verifyPassword(plainTextPassword, user.password);
       user.password = undefined;
       return user;
@@ -55,15 +55,26 @@ export class AuthService {
     plainTextPassword: string,
     hashedPassword: string,
   ) {
-    const isPasswordMatching = await bcrypt.compare(
-      plainTextPassword,
-      hashedPassword,
-    );
-    if (!isPasswordMatching) {
-      throw new HttpException(
-        'Wrong credentials provided',
-        HttpStatus.BAD_REQUEST,
+    try {
+      Logger.log('verifyPassword', {
+        plainTextPassword,
+        hashedPassword,
+      });
+      const isPasswordMatching = await bcrypt.compare(
+        plainTextPassword,
+        hashedPassword,
       );
+      Logger.log('verifyPassword', {
+        isPasswordMatching,
+      });
+      if (!isPasswordMatching) {
+        throw new HttpException(
+          'Wrong credentials provided',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+    } catch (error) {
+      Logger.error('verifyPassword', error);
     }
   }
   public getCookieWithJwt(userId: string) {
