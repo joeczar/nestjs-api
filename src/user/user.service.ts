@@ -26,11 +26,8 @@ export class UserService {
   }
   async create(userData: CreateUserDto) {
     try {
-      Logger.log('UserService - create', { userData });
       const newUser = await this.userRepository.create(userData);
-      Logger.log('UserService - create', { newUser });
       const savedUser = await this.userRepository.save(newUser);
-      Logger.log('UserService - create', { newUser, savedUser });
       return newUser;
     } catch (error) {
       throw new Error('User creation error');

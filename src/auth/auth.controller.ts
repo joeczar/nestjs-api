@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
-import RequestWithUser from './requestWithUser.interface';
+import { RequestWithUser } from './request.interface';
 import { LocalAuthGuard } from './localAuth.guard';
 import { JwtAuthGuard } from './jwtAuth.guard';
 import { Response } from 'express';
@@ -30,10 +30,14 @@ export class AuthController {
   @HttpCode(200)
   @UseGuards(LocalAuthGuard)
   @Post('log-in')
-  async logIn(@Req() request: RequestWithUser) {
-    const user = request.user;
-    user.password = undefined;
-    return user;
+  async logIn(@Req() request: RequestWithUser, @Res() response: Response) {
+    try {
+      const { user } = request;
+      const token = this.authService.getJwt(user.id);
+      return response.json(token);
+    } catch (error) {
+      Logger.error('Login error', error);
+    }
   }
 
   @UseGuards(JwtAuthGuard)
@@ -43,10 +47,9 @@ export class AuthController {
     return response.sendStatus(200);
   }
   @UseGuards(JwtAuthGuard)
-  @Get()
-  authenticate(@Req() request: RequestWithUser) {
+  @Get('user')
+  authenticate(@Req() request: RequestWithUser, @Res() response: Response) {
     const user = request.user;
-    // user.password = undefined;
-    return user;
+    return response.json({ user });
   }
 }

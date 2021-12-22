@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { PostgresErrorCode } from 'src/database/postgresErrorCodes.enum';
 import { UserService } from 'src/user/user.service';
-import { RegisterDto } from './dto/register.dto';
+import { RegisterDto, ReturnedUserDto } from './dto/register.dto';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
@@ -36,13 +36,17 @@ export class AuthService {
       );
     }
   }
-  public async getAuthenticatedUser(email: string, plainTextPassword: string) {
+  public async getAuthenticatedUser(
+    email: string,
+    plainTextPassword: string,
+  ): Promise<ReturnedUserDto> {
     try {
-      const user = await this.userService.getByEmail(email);
-      Logger.log('getAuthenticatedUser', { user, email });
-      await this.verifyPassword(plainTextPassword, user.password);
-      user.password = undefined;
-      return user;
+      const { password, ...returnedUser } = await this.userService.getByEmail(
+        email,
+      );
+      await this.verifyPassword(plainTextPassword, password);
+
+      return returnedUser;
     } catch (error) {
       throw new HttpException(
         'Wrong credentials provided',
@@ -56,10 +60,6 @@ export class AuthService {
     hashedPassword: string,
   ) {
     try {
-      Logger.log('verifyPassword', {
-        plainTextPassword,
-        hashedPassword,
-      });
       const isPasswordMatching = await bcrypt.compare(
         plainTextPassword,
         hashedPassword,
@@ -77,9 +77,13 @@ export class AuthService {
       Logger.error('verifyPassword', error);
     }
   }
-  public getCookieWithJwt(userId: string) {
+  public getJwt(userId: string) {
     const payload: TokenPayload = { userId };
     const token = this.jwtService.sign(payload);
+    return token;
+  }
+  public getCookieWithJwt(userId: string) {
+    const token = this.getJwt(userId);
     return `Authentication=${token}; HttpOnly; Path=/; Max-Age=${this.configService.get(
       'JWT_EXPIRATION_TIME',
     )}`;

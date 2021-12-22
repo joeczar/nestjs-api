@@ -4,3 +4,8 @@ export class RegisterDto {
   email: string;
   password: string;
 }
+export class ReturnedUserDto {
+  firstname?: string;
+  lastname?: string;
+  email: string;
+}
