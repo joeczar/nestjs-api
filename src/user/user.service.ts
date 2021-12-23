@@ -4,6 +4,7 @@ import { randomBytes, scryptSync } from 'crypto';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/createUser.dto';
 import { User } from './user.entity';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {
@@ -43,5 +44,20 @@ export class UserService {
       "User with this id doesn't exist",
       HttpStatus.NOT_FOUND,
     );
+  }
+  async setCurrentRefreshToken(refreshToken: string, userId: string) {
+    await this.userRepository.update(userId, {
+      currentHashedRefreshToken: refreshToken,
+    });
+  }
+  async getUserIfRefreshTokenMatches(refreshToken: string, userId: string) {
+    const user = await this.getById(userId);
+    const isRefreshTokenMatch = await bcrypt.compare(
+      refreshToken,
+      user.currentHashedRefreshToken,
+    );
+    if (isRefreshTokenMatch) {
+      return user;
+    }
   }
 }
