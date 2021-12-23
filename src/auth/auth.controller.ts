@@ -39,6 +39,18 @@ export class AuthController {
       Logger.error('Login error', error);
     }
   }
+  @HttpCode(200)
+  @UseGuards(JwtAuthGuard)
+  @Post('refresh')
+  async refresh(@Req() request: RequestWithUser, @Res() response: Response) {
+    try {
+      const { user } = request;
+      const token = this.authService.getRefreshToken(user.id);
+      return response.json(token);
+    } catch (error) {
+      Logger.error('Login error', error);
+    }
+  }
 
   @UseGuards(JwtAuthGuard)
   @Post('log-out')

@@ -5,6 +5,7 @@ import {
   Entity,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { Exclude } from 'class-transformer';
 import * as bcrypt from 'bcrypt';
 import { Logger } from '@nestjs/common';
 
@@ -34,12 +35,26 @@ export class User {
   })
   email: string;
 
+  @Exclude()
+  public currentHashedRefreshToken?: string;
+
   @BeforeInsert()
   @BeforeUpdate()
   async hashPassword() {
     try {
       const hashed = await bcrypt.hash(this.password, 10);
       this.password = hashed;
+    } catch (error) {
+      Logger.error('bcrypt error', { error });
+      throw new Error('bcrypt error');
+    }
+  }
+  @BeforeInsert()
+  @BeforeUpdate()
+  async hashToken() {
+    try {
+      const hashed = await bcrypt.hash(this.currentHashedRefreshToken, 10);
+      this.currentHashedRefreshToken = hashed;
     } catch (error) {
       Logger.error('bcrypt error', { error });
       throw new Error('bcrypt error');
