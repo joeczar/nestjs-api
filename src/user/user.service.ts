@@ -1,5 +1,6 @@
 import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { randomBytes, scryptSync } from 'crypto';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/createUser.dto';
 import { User } from './user.entity';
@@ -26,6 +27,7 @@ export class UserService {
   }
   async create(userData: CreateUserDto) {
     try {
+      Logger.log('UserService - create', { userData });
       const newUser = await this.userRepository.create(userData);
       const savedUser = await this.userRepository.save(newUser);
       return newUser;
@@ -42,4 +44,5 @@ export class UserService {
       HttpStatus.NOT_FOUND,
     );
   }
+  
 }

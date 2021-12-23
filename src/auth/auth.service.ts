@@ -2,10 +2,10 @@ import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { PostgresErrorCode } from 'src/database/postgresErrorCodes.enum';
 import { UserService } from 'src/user/user.service';
 import { RegisterDto, ReturnedUserDto } from './dto/register.dto';
-import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { TokenPayload } from './tokenPayload.interface';
+import { compareHash } from 'src/database/crypto.helper';
 
 @Injectable()
 export class AuthService {
@@ -17,11 +17,10 @@ export class AuthService {
 
   public async register(registrationData: RegisterDto) {
     try {
-      Logger.log('AuthService - register', { registrationData });
+      Logger.log('AuthService - register', { ...registrationData });
       const createdUser = await this.userService.create({
         ...registrationData,
       });
-      createdUser.password = undefined;
       return createdUser;
     } catch (error) {
       if (error?.code === PostgresErrorCode.UniqueViolation) {
@@ -60,7 +59,7 @@ export class AuthService {
     hashedPassword: string,
   ) {
     try {
-      const isPasswordMatching = await bcrypt.compare(
+      const isPasswordMatching = await compareHash(
         plainTextPassword,
         hashedPassword,
       );
@@ -79,7 +78,10 @@ export class AuthService {
   }
   public getJwt(userId: string) {
     const payload: TokenPayload = { userId };
-    const token = this.jwtService.sign(payload);
+    const token = this.jwtService.sign(payload, {
+      secret: this.configService.get('JWT_SECRET'),
+      expiresIn: `${this.configService.get('JWT_EXPIRATION_TIME')}`,
+    });
     return token;
   }
   public getRefreshToken(userId: string) {
