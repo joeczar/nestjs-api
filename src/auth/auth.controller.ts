@@ -15,10 +15,14 @@ import { RequestWithUser } from './request.interface';
 import { LocalAuthGuard } from './localAuth.guard';
 import { JwtAuthGuard } from './jwtAuth.guard';
 import { Response } from 'express';
+import { UserService } from 'src/user/user.service';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly usersService: UserService,
+  ) {}
 
   @Post('register')
   async register(@Body() registrationData: RegisterDto) {
@@ -34,7 +38,13 @@ export class AuthController {
     try {
       const { user } = request;
       const token = this.authService.getJwt(user.id);
-      return response.json(token);
+      const refresh_token = this.authService.getRefreshToken(user.id);
+      Logger.log('log-in', {
+        token,
+        refresh_token,
+      });
+      await this.usersService.setCurrentRefreshToken(refresh_token, user.id);
+      return response.json({ token, refresh_token });
     } catch (error) {
       Logger.error('Login error', error);
     }
@@ -44,9 +54,10 @@ export class AuthController {
   @Post('refresh')
   async refresh(@Req() request: RequestWithUser, @Res() response: Response) {
     try {
+      Logger.log('refresh', request.cookies);
       const { user } = request;
-      const token = this.authService.getRefreshToken(user.id);
-      return response.json(token);
+      const refresh_token = this.authService.getRefreshToken(user.id);
+      return response.json(refresh_token);
     } catch (error) {
       Logger.error('Login error', error);
     }
