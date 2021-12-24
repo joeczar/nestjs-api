@@ -12,8 +12,8 @@ import {
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { RequestWithUser } from './request.interface';
-import { LocalAuthGuard } from './localAuth.guard';
-import { JwtAuthGuard } from './jwtAuth.guard';
+import { LocalAuthGuard } from './guards/localAuth.guard';
+import { JwtAuthGuard } from './guards/jwtAuth.guard';
 import { Response } from 'express';
 
 @Controller('auth')
@@ -45,8 +45,9 @@ export class AuthController {
   async refresh(@Req() request: RequestWithUser, @Res() response: Response) {
     try {
       const { user } = request;
-      const token = this.authService.getRefreshToken(user.id);
-      return response.json(token);
+      const token = this.authService.getJwt(user.id);
+      const refresh_token = this.authService.getRefreshToken(user.id);
+      return response.json({ token, refresh_token });
     } catch (error) {
       Logger.error('Login error', error);
     }

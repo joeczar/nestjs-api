@@ -1,6 +1,7 @@
 import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { randomBytes, scryptSync } from 'crypto';
+import { compareHash } from 'src/database/crypto.helper';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/createUser.dto';
 import { User } from './user.entity';
@@ -43,5 +44,22 @@ export class UserService {
       "User with this id doesn't exist",
       HttpStatus.NOT_FOUND,
     );
+  }
+  async setCurrentRefreshToken(refreshToken: string, userId: string) {
+    await this.userRepository.update(userId, {
+      currentHashedRefreshToken: refreshToken,
+    });
+  }
+  async getUserIfRefreshTokenMatches(refreshToken: string, userId: string) {
+    try {
+      const user = await this.getById(userId);
+      const isRefreshMatch = await compareHash(
+        refreshToken,
+        user.currentHashedRefreshToken,
+      );
+      if (isRefreshMatch) return user;
+    } catch (error) {
+      Logger.error('getUserIfRefreshTokenMatches error', { error });
+    }
   }
 }

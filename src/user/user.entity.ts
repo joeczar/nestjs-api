@@ -46,10 +46,10 @@ export class User {
     this.password = hashed;
     Logger.log('hashed', { hashed: this.password });
   }
-  // @BeforeInsert()
-  // @BeforeUpdate()
-  // async hashToken() {
-  //   const hashed = getHash(this.currentHashedRefreshToken);
-  //   this.currentHashedRefreshToken = hashed;
-  // }
+  @BeforeInsert()
+  @BeforeUpdate()
+  async hashToken() {
+    const hashed = getHash(this.currentHashedRefreshToken);
+    this.currentHashedRefreshToken = hashed;
+  }
 }

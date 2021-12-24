@@ -1,6 +1,6 @@
 import { Controller, Get, Req, Res, UseGuards } from '@nestjs/common';
 import { Request, Response } from 'express';
-import { JwtAuthGuard } from 'src/auth/jwtAuth.guard';
+import { JwtAuthGuard } from 'src/auth/guards/jwtAuth.guard';
 import { User } from './user.entity';
 import { UserService } from './user.service';
 
@@ -9,7 +9,7 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
   // @UseGuards(JwtAuthGuard)
   @Get()
-  getHello(@Req() request: Request, @Res() response: Response) {
-    return response.json(this.userService.getAll());
+  async getHello() {
+    return await this.userService.getAll();
   }
 }
