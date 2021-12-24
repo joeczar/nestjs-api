@@ -1,10 +1,9 @@
 import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { randomBytes, scryptSync } from 'crypto';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/createUser.dto';
 import { User } from './user.entity';
-import * as bcrypt from 'bcrypt';
+import { compareHash } from 'src/database/crypto.helper';
 
 @Injectable()
 export class UserService {
@@ -30,7 +29,9 @@ export class UserService {
     try {
       Logger.log('UserService - create', { userData });
       const newUser = await this.userRepository.create(userData);
-      await this.userRepository.save(newUser);
+      Logger.log('create', { newUser });
+      const saved = await this.userRepository.save(newUser);
+      Logger.log('create', { saved });
       return newUser;
     } catch (error) {
       throw new Error('User creation error');
@@ -52,7 +53,7 @@ export class UserService {
   }
   async getUserIfRefreshTokenMatches(refreshToken: string, userId: string) {
     const user = await this.getById(userId);
-    const isRefreshTokenMatch = await bcrypt.compare(
+    const isRefreshTokenMatch = await compareHash(
       refreshToken,
       user.currentHashedRefreshToken,
     );

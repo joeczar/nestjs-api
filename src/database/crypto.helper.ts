@@ -9,7 +9,7 @@ export async function compareHash(
   plainText: string,
   hashed: string,
 ): Promise<boolean> {
-  const hash = this.getHash(plainText);
+  const hash = getHash(plainText);
   if (hashed === hash) return true;
   return false;
 }

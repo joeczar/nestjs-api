@@ -35,8 +35,11 @@ export class User {
   })
   email: string;
 
-  @Exclude()
-  public currentHashedRefreshToken?: string;
+  @Column({
+    type: 'varchar',
+    nullable: true,
+  })
+  currentHashedRefreshToken?: string;
 
   @BeforeInsert()
   @BeforeUpdate()
@@ -46,10 +49,10 @@ export class User {
     this.password = hashed;
     Logger.log('hashed', { hashed: this.password });
   }
-  // @BeforeInsert()
-  // @BeforeUpdate()
-  // async hashToken() {
-  //   const hashed = getHash(this.currentHashedRefreshToken);
-  //   this.currentHashedRefreshToken = hashed;
-  // }
+  @BeforeInsert()
+  @BeforeUpdate()
+  async hashToken() {
+    const hashed = getHash(this.currentHashedRefreshToken);
+    this.currentHashedRefreshToken = hashed;
+  }
 }
