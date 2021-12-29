@@ -43,6 +43,7 @@ export class AuthService {
       const { password, ...returnedUser } = await this.userService.getByEmail(
         email,
       );
+      Logger.log('getAuthenticatedUser', { returnedUser, password });
       await this.verifyPassword(plainTextPassword, password);
 
       return returnedUser;

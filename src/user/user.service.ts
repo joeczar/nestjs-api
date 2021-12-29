@@ -15,15 +15,20 @@ export class UserService {
     const users = this.userRepository.find();
     return users;
   }
-  async getByEmail(email: string) {
-    const user = await this.userRepository.findOne({ email });
-    if (user) {
-      return user;
+  async getByEmail(email: string): Promise<User> {
+    try {
+      const user = await this.userRepository.findOne({ email });
+      Logger.log('UserService - getByEmail', { user });
+      if (user?.email) {
+        return user;
+      }
+      throw new HttpException(
+        'User with this email does not exist',
+        HttpStatus.NOT_FOUND,
+      );
+    } catch (error) {
+      Logger.error('UserService - getByEmail', error);
     }
-    throw new HttpException(
-      'User with this email does not exist',
-      HttpStatus.NOT_FOUND,
-    );
   }
   async create(userData: CreateUserDto) {
     try {
