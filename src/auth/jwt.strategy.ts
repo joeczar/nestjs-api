@@ -2,11 +2,8 @@ import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
-import { Request } from 'express';
 import { UserService } from 'src/user/user.service';
 import { TokenPayload } from './tokenPayload.interface';
-import { isArray } from 'util';
-
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(
@@ -20,8 +17,11 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
   async validate(payload: TokenPayload) {
     Logger.log('jwt - validate', { payload });
-    const user = await this.userService.getById(payload.userId);
-    Logger.log('jwt - validate', { user });
-    return user;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password, ...returnUser } = await this.userService.getById(
+      payload.userId,
+    );
+    Logger.log('jwt - validate', { returnUser });
+    return returnUser;
   }
 }

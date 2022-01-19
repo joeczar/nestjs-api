@@ -39,6 +39,7 @@ export class AuthController {
       Logger.error('Login error', error);
     }
   }
+
   @HttpCode(200)
   @UseGuards(JwtAuthGuard)
   @Post('refresh')

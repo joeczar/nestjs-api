@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { randomBytes, scryptSync } from 'crypto';
 import { Repository } from 'typeorm';
-import { CreateUserDto } from './dto/createUser.dto';
+import { CreateUserDto, UpdateUserDto } from './dto/createUser.dto';
 import { User } from './user.entity';
 
 @Injectable()
@@ -48,5 +48,13 @@ export class UserService {
       "User with this id doesn't exist",
       HttpStatus.NOT_FOUND,
     );
+  }
+  async updateUser(id: string, user: UpdateUserDto) {
+    try {
+      const savedUser = await this.userRepository.update(id, user);
+      return savedUser;
+    } catch (error) {
+      Logger.log('Error updating user', error);
+    }
   }
 }
