@@ -28,7 +28,7 @@ export class UserController {
 
   @HttpCode(200)
   @UseGuards(JwtAuthGuard)
-  @Patch(':id')
+  @Post(':id')
   async updateUser(@Param('id') id: string, @Body() user: UpdateUserDto) {
     Logger.log('update', { id, user });
     return this.userService.updateUser(id, user);
