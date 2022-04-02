@@ -3,7 +3,7 @@ import {
   getConnection,
   Connection,
   ConnectionOptions,
-} from 'TypeORM';
+} from 'typeorm';
 export const getDbConnectionOptions = async (
   connectionName = 'default',
 ): Promise<ConnectionOptions> => {

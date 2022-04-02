@@ -1,7 +1,7 @@
 version: '3.9'
 
 services:
-  nestjs_postgres:
+  bib_postgres:
     container_name: bib_postgres
     image: postgres:14-alpine
     ports:
@@ -9,13 +9,13 @@ services:
     volumes:
     - ./data/postgres:/data/postgres
     env_file:
-    - docker.env
+    - .env
     networks:
     - breakfastinbed
 
   pgadmin:
       links:
-      - postgres:postgres
+      - bib_postgres:bib_postgres
       container_name: pgadmin
       image: dpage/pgadmin4
       ports:
@@ -23,11 +23,11 @@ services:
       volumes:
       - ./data/pgadmin:/root/.pgadmin
       env_file:
-      - docker.env
+      - .env
       networks:
       - breakfastinbed
       depends_on:
-        - nestjs_postgres
+        - bib_postgres
 networks:
   breakfastinbed:
-   driver: bridge
+    driver: bridge

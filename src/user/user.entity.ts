@@ -7,7 +7,7 @@ import {
 } from 'typeorm';
 import { Exclude } from 'class-transformer';
 import { Logger } from '@nestjs/common';
-import { getHash } from 'src/database/crypto.helper';
+import { getHash } from '../database/crypto.helper';
 
 @Entity('user')
 export class User {
@@ -42,14 +42,16 @@ export class User {
   @BeforeUpdate()
   async hashPassword() {
     Logger.log('UserEntity - hashPassword', { password: this.password });
-    const hashed = getHash(this.password);
-    this.password = hashed;
-    Logger.log('hashed', { hashed: this.password });
+    try {
+      Logger.log('hashPassword', { 'this.passwword': this.password });
+      const hashed = getHash(this.password);
+      Logger.log('hashPassword', { hashed });
+      if (hashed) {
+        this.password = hashed;
+        return;
+      }
+    } catch (error) {
+      Logger.error('hashPassword', error);
+    }
   }
-  // @BeforeInsert()
-  // @BeforeUpdate()
-  // async hashToken() {
-  //   const hashed = getHash(this.currentHashedRefreshToken);
-  //   this.currentHashedRefreshToken = hashed;
-  // }
 }
