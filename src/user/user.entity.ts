@@ -47,7 +47,7 @@ export class User {
       const hashed = getHash(this.password);
       Logger.log('hashPassword', { hashed });
       if (hashed) {
-        this.password = hashed;
+        this.password = hashed as string;
         return;
       }
     } catch (error) {
