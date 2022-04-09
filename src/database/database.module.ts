@@ -1,3 +1,4 @@
+import { Order } from './../orders/entities/order.entity';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -15,7 +16,8 @@ import { User } from 'src/user/user.entity';
         username: configService.get('POSTGRES_USER'),
         password: configService.get('POSTGRES_PASSWORD'),
         database: configService.get('POSTGRES_DATABASE'),
-        entities: [User],
+        entities: [User, Order],
+        autoLoadEntities: true,
         synchronize: true,
       }),
     }),

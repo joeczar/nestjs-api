@@ -8,7 +8,8 @@ import { AuthModule } from './auth/auth.module';
 import * as Joi from '@hapi/joi';
 import { UserService } from './user/user.service';
 import { UserModule } from './user/user.module';
-import { OrderModule } from './order/order.module';
+
+import { OrdersModule } from './orders/orders.module';
 
 @Module({
   imports: [
@@ -29,7 +30,8 @@ import { OrderModule } from './order/order.module';
     DatabaseModule,
     AuthModule,
     UserModule,
-    OrderModule,
+
+    OrdersModule,
   ],
 
   controllers: [AppController],
