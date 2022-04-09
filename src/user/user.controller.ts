@@ -22,8 +22,8 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
   // @UseGuards(JwtAuthGuard)
   @Get()
-  getHello(@Req() request: Request, @Res() response: Response) {
-    return response.json(this.userService.getAll());
+  findAll() {
+    return this.userService.findAll();
   }
 
   @HttpCode(200)
@@ -32,5 +32,9 @@ export class UserController {
   async updateUser(@Param('id') id: string, @Body() user: UpdateUserDto) {
     Logger.log('update', { id, user });
     return this.userService.updateUser(id, user);
+  }
+  @Get(':name')
+  async getUsersWithName(@Param('name') name: string) {
+    return this.userService.getAllThatMatchName(name);
   }
 }

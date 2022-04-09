@@ -1,7 +1,6 @@
 import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { randomBytes, scryptSync } from 'crypto';
-import { Repository } from 'typeorm';
+import { ILike, Like, Repository } from 'typeorm';
 import { CreateUserDto, UpdateUserDto } from './dto/createUser.dto';
 import { User } from './user.entity';
 
@@ -11,7 +10,7 @@ export class UserService {
     @InjectRepository(User)
     private userRepository: Repository<User>,
   ) {}
-  async getAll() {
+  async findAll() {
     const users = this.userRepository.find();
     return users;
   }
@@ -34,7 +33,7 @@ export class UserService {
     try {
       Logger.log('UserService - create', { userData });
       const newUser = await this.userRepository.create(userData);
-      const savedUser = await this.userRepository.save(newUser);
+      await this.userRepository.save(newUser);
       return newUser;
     } catch (error) {
       throw new Error('User creation error');
@@ -56,5 +55,18 @@ export class UserService {
     } catch (error) {
       Logger.log('Error updating user', error);
     }
+  }
+  async getAllThatMatchName(name: string) {
+    const [firstname, lastname] = name.split(' ');
+    const users = await this.userRepository.find({
+      firstname: ILike(`%${firstname}%`),
+    });
+    Logger.log('UserService - getAllThatMatchName', {
+      users,
+      name,
+      firstname,
+      lastname,
+    });
+    return users;
   }
 }
