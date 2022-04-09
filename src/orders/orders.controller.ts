@@ -1,3 +1,4 @@
+import { Order } from './entities/order.entity';
 import {
   Controller,
   Get,
@@ -6,18 +7,37 @@ import {
   Patch,
   Param,
   Delete,
+  Logger,
 } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 @Controller('orders')
 export class OrdersController {
-  constructor(private readonly ordersService: OrdersService) {}
+  constructor(
+    @InjectRepository(Order)
+    private readonly orderRepository: Repository<Order>,
+    private readonly ordersService: OrdersService,
+  ) {}
 
   @Post()
-  create(@Body() createOrderDto: CreateOrderDto) {
-    return this.ordersService.create(createOrderDto);
+  async create(@Body() createOrderDto: CreateOrderDto) {
+    Logger.log('createOrderDto', createOrderDto);
+    try {
+      const createOrder = await this.ordersService.create(createOrderDto);
+      const success = await this.orderRepository.save(createOrder);
+      if (success) {
+        return {
+          status: 201,
+          message: 'Order created successfully',
+        };
+      }
+    } catch (error) {
+      Logger.error('Error creating order', error);
+    }
   }
 
   @Get()
