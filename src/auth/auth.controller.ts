@@ -15,6 +15,7 @@ import { RequestWithUser } from './request.interface';
 import { LocalAuthGuard } from './localAuth.guard';
 import { JwtAuthGuard } from './jwtAuth.guard';
 import { Response } from 'express';
+import { users } from '../user/mockData/users';
 
 @Controller('auth')
 export class AuthController {
@@ -24,6 +25,14 @@ export class AuthController {
   async register(@Body() registrationData: RegisterDto) {
     const result = this.authService.register(registrationData);
     Logger.log({ registrationData, result });
+    return result;
+  }
+  @Get('generate-users')
+  async generateRegisteredUsers() {
+    const result = users.forEach(async (user) => {
+      const success = await this.authService.register(user);
+      return success;
+    });
     return result;
   }
 

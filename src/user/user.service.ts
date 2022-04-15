@@ -59,7 +59,7 @@ export class UserService {
   async getAllThatMatchName(name: string) {
     const [firstname, lastname] = name.split(' ');
     const users = await this.userRepository.find({
-      firstname: ILike(`%${firstname}%`),
+      firstname: ILike(`${firstname}%`),
     });
     Logger.log('UserService - getAllThatMatchName', {
       users,
