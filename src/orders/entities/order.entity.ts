@@ -26,8 +26,8 @@ export class Order {
   @Column('varchar', { array: true })
   items: string[];
   @Column({
-    type: 'json',
+    type: 'varchar',
     nullable: false,
   })
-  cookId: Server;
+  cookId: string;
 }

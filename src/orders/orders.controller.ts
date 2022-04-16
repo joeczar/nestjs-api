@@ -27,6 +27,7 @@ export class OrdersController {
   async create(@Body() createOrderDto: CreateOrderDto) {
     Logger.log('createOrderDto', createOrderDto);
     try {
+      Logger.log('ordersController - create', { createOrderDto });
       const createOrder = await this.ordersService.create(createOrderDto);
       const success = await this.orderRepository.save(createOrder);
       if (success) {

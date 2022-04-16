@@ -24,6 +24,7 @@ export class User {
   })
   lastname: string;
   @Column({
+    select: false,
     type: 'varchar',
     nullable: false,
   })
@@ -38,6 +39,7 @@ export class User {
   @Exclude()
   public currentHashedRefreshToken?: string;
 
+  @Exclude()
   @BeforeInsert()
   @BeforeUpdate()
   async hashPassword() {

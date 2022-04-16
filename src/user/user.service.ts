@@ -14,11 +14,16 @@ export class UserService {
     const users = this.userRepository.find();
     return users;
   }
-  async getByEmail(email: string): Promise<User> {
+  async getByEmail(email: string): Promise<CreateUserDto> {
     try {
-      const user = await this.userRepository.findOne({ email });
+      const user = await this.userRepository
+        .createQueryBuilder('user')
+        .select('user')
+        .where('user.email = :email', { email })
+        .addSelect('password')
+        .getOne();
       Logger.log('UserService - getByEmail', { user });
-      if (user?.email) {
+      if (user) {
         return user;
       }
       throw new HttpException(
