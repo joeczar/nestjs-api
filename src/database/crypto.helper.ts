@@ -9,6 +9,13 @@ export function getHash(password: string): string {
 }
 export function compareHash(plainText: string, hashed: string): boolean {
   const hash = getHash(plainText);
-  if (hashed === hash) return true;
-  return false;
+  const test = getHash(plainText);
+  Logger.log('compareHash', {
+    plainText,
+    hashed,
+    hash,
+    match: hashed === hash,
+    testMatch: test === hash,
+  });
+  return hashed === hash;
 }

@@ -20,7 +20,7 @@ export class UserService {
         .createQueryBuilder('user')
         .select('user')
         .where('user.email = :email', { email })
-        .addSelect('password')
+        .addSelect('user.password')
         .getOne();
       Logger.log('UserService - getByEmail', { user });
       if (user) {

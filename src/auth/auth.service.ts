@@ -44,9 +44,17 @@ export class AuthService {
         email,
       );
       Logger.log('getAuthenticatedUser', { returnedUser, password });
-      await this.verifyPassword(plainTextPassword, password);
+      if (!password) {
+        Logger.error('no passowrd!');
+        throw new HttpException(
+          'Something went wrong',
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+      }
 
-      return returnedUser;
+      const match = await this.verifyPassword(plainTextPassword, password);
+
+      return match ? returnedUser : null;
     } catch (error) {
       throw new HttpException(
         'Wrong credentials provided',
@@ -72,7 +80,9 @@ export class AuthService {
           'Wrong credentials provided',
           HttpStatus.BAD_REQUEST,
         );
+        return false;
       }
+      return true;
     } catch (error) {
       Logger.error('verifyPassword', error);
     }
