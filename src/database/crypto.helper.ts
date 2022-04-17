@@ -1,7 +1,7 @@
 import { Logger } from '@nestjs/common';
-import { randomBytes, scryptSync } from 'crypto';
+import { scryptSync } from 'crypto';
 
-const salt = randomBytes(16).toString('hex');
+const salt = process.env.SALT;
 
 export function getHash(password: string): string {
   const hash = scryptSync(password, salt, 32).toString('hex');
